@@ -34,6 +34,9 @@ export default function Header() {
         <Link to='profile'>
             <li className='text-slate-700  hover:underline'>Profile</li>
         </Link>
+        <Link to='sign-up'>
+            <li className='text-slate-700  hover:underline'>Signup</li>
+        </Link>
         
        </ul>
    
