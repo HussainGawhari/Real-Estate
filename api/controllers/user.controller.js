@@ -1,7 +1,38 @@
-export const test = (req, res) =>{
-    res.json(
-        {
-            message: "test message received"
-        })
+import { errorHandler } from "../utils/error.js";
+import bcryptjs  from 'bcryptjs';
+import User from '../models/user.model.js';
+export const test = (req, res) => {
+  res.json({
+    message: "test message received",
+  });
 };
-   
+
+export const updateUser = async (req, res, next) => {
+  if (req.user.id !== req.params.id)
+    return next(errorHandler(401, " you can only update your onw account"));
+
+    try {
+        if (req.body.password)
+        {
+            req.body.password = bcryptjs.hashSync(req.body.password);
+        }
+
+        const updatedUser = await User.findByIdAndUpdate(
+            req.params.id,
+            {
+                $set: {
+                    username: req.body.username,
+                    email: req.body.email,
+                    password: req.body.password,
+                    avatar: req.body.avatar,
+                  },
+            } ,{mew : true},     
+        );
+
+        const { password, ...rest } = updatedUser._doc;
+        res.status(200).json(rest);
+        
+    } catch (e) {
+        next(e);
+    };
+};
