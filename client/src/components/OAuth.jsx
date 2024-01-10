@@ -23,8 +23,13 @@ export default function OAuth() {
         }),
       });
       const data = await res.json();
+      console.log("Data:",data);
+      if (data.success === false) {
+        return 
+      }
       dispatch(signInSuccess(data));
       navigate("/");
+
     } catch (err) {
       console.log("could not sign in with google", err);
     }
