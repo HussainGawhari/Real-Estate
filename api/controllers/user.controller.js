@@ -11,9 +11,7 @@ export const updateUser = async (req, res, next) => {
   console.log(req.params.id==req.user.id);
   console.log("data from update req.body",req.body);
   if (req.user.id !== req.params.id)
- 
-
-    return next(errorHandler(401, 'You can only update your own account!'));
+     return next(errorHandler(401, 'You can only update your own account!'));
   try {
     if (req.body.password) {
       req.body.password = bcryptjs.hashSync(req.body.password, 10);
@@ -39,3 +37,17 @@ export const updateUser = async (req, res, next) => {
     next(error);
   }
 };
+
+export const deleteUser = async (req, res,next) => {
+  if (req.user.id !== req.params.id) 
+    return next(errorHandler(401, 'you can delete only your account'));
+
+    try {
+      await User.findByIdAndDelete(req.user.id);
+      res.clearCookie('access_token');
+      res.status(200).json('message: user deleted successfully');
+    } catch (error) {
+      next(error);
+    }
+  }
+

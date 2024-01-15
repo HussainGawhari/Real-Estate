@@ -10,7 +10,7 @@ dotenv.config();
 mongoose.connect(process.env.MONGO).then( () => {
     console.log('connect success');
     }).catch( () => {
-        console.log(err);
+        console.log("failed to connect");
     });
 
 const app = express();

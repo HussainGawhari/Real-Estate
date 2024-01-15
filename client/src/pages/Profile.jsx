@@ -13,6 +13,11 @@ import {
   updateUserStart,
   updateUserSuccess,
   updateUserFailure,
+  deleteUserFailure,
+  deleteUserSuccess,
+  deleteUserStart,
+  signOutUserStart,
+  signOutUserSuccess,
 } from "../redux/user/userSlice";
 
 export default function Profile() {
@@ -57,7 +62,6 @@ export default function Profile() {
     );
   };
 
-
   const handleChange = (e) => {
     setFormData({
       ...formData,
@@ -71,9 +75,9 @@ export default function Profile() {
     try {
       dispatch(updateUserStart());
       const res = await fetch(`/api/user/update/${currentUser._id}`, {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify(formData),
       });
@@ -89,10 +93,37 @@ export default function Profile() {
       dispatch(updateUserFailure(error.message));
     }
   };
+
+  const handleDeleteUser = async () => {
+    try {
+      dispatch(deleteUserStart());
+      const res = await fetch(`/api/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (data.success === false) {
+        dispatch(deleteUserFailure(data.message));
+        return;
+      }
+      dispatch(deleteUserSuccess(data));
+    } catch (error) {
+      dispatch(deleteUserFailure(error.message));
+    }
+  };
+
+  const handleSignOut = async () => {
+    try {
+      dispatch(signOutUserStart());
+      await fetch(`api/auth/sign-out`);
+      dispatch(signOutUserSuccess());
+    } catch (err) {
+      dispatch(signOutFailure(err.message));
+    }
+  };
   return (
     <div className=" p-3 max-w-lg mx-auto">
       <h1 className=" text-3xl font-semibold text-center">Profile</h1>
-      <form onSubmit = {handleSubmit} className="flex flex-col gap-4">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <input
           onChange={(e) => setFile(e.target.files[0])}
           ref={fileRef}
@@ -146,13 +177,26 @@ export default function Profile() {
         />
 
         <button
-          // disabled={loading}
+          disabled={loading}
           className="bg-slate-700 text-white rounded-lg p-3 uppercase hover:opacity-95 disabled:opacity-80"
         >
-          update
-          {/* {loading ? "Loading" : "Update"} */}
+          {loading ? "Loading..." : "update"}
         </button>
       </form>
+      <div className=" flex justify-between mt-5">
+        <span
+          onClick={handleDeleteUser}
+          className=" text-red-700 cursor-pointer"
+        >
+          Delete Account
+        </span>
+        <span
+          onClick={handleSignOut}
+          className=" text-slate-700 cursor-pointer"
+        >
+          Sign out
+        </span>
+      </div>
     </div>
   );
 }
