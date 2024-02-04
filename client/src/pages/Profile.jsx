@@ -182,6 +182,12 @@ export default function Profile() {
         >
           {loading ? "Loading..." : "update"}
         </button>
+          
+          <Link 
+          to={"/create-listing"}
+          className="bg-green-700 text-white p-3 text-center rounded-lg uppercase hover:opacity-95 first-letter:">
+            create Listing
+          </Link>
       </form>
       <div className=" flex justify-between mt-5">
         <span
