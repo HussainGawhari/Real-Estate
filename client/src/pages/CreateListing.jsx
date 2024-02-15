@@ -33,7 +33,7 @@ export default function CreateListing() {
   const [error, setError] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  // console.log(formData);
+  console.log(formData);
 
   const handleImageSubmit = (e) => {
     if (files.length > 0 && files.length + formData.imageUrls.length < 7) {
@@ -149,6 +149,7 @@ export default function CreateListing() {
         setError(data.message);
       }
       navigate(`/listing/${data._id}`);
+      console.log("data recorded successfully");
     } catch (error) {
       setError(error.message);
       setLoading(false);
@@ -167,7 +168,7 @@ export default function CreateListing() {
         <div className="flex flex-col gap-4 flex-1 ">
           <input
             type="text"
-            placeholder="Name"
+            placeholder="Title"
             className="border rounded-lg p-3"
             maxLength="62"
             minLength="10"
@@ -292,7 +293,8 @@ export default function CreateListing() {
                   )}
                 </div>
               </div>
-              <div className="flex gap-2 items-center ">
+              {formData.offer && (
+                <div className="flex gap-2 items-center ">
                 <input
                   type="number"
                   id="discountPrice"
@@ -310,6 +312,7 @@ export default function CreateListing() {
                   )}
                 </div>
               </div>
+              )}
             </div>
           </div>
         </div>
@@ -332,6 +335,7 @@ export default function CreateListing() {
               className=" p-3 w-full rounded-md border border-gray-300 "
             />
             <button
+              disabled = {uploading}
               type="button"
               onClick={handleImageSubmit}
               className=" p-3 text-green-700 border rounded-md border-green-700  hover:shadow-lg disabled:opacity-80"
@@ -365,7 +369,7 @@ export default function CreateListing() {
 
           <button
             disabled={loading || uploading}
-            className=" p-3 bg-gray-700 uppercase hover:opacity-95 text-white rounded-lg "
+            className=" p-3 bg-gray-700 uppercase hover:opacity-95 text-white rounded-lg disabled:opacity-80"
           >
             {loading ? "Creating..." : "Create listing"}
           </button>

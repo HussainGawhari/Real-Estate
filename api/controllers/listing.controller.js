@@ -9,3 +9,24 @@ export const createListing = async (req, res, next) => {
     next(err);
   }
 };
+
+export const deleteListing = async (req, res, next) => {
+  const listing = await Listing.findById(req.params.id);
+  console.log(listing);
+
+  if(!listing) {
+
+    return next(errorHandler(404,'listing not found'));
+  }
+  if ( req.user.id !== listing.userRef) {
+    return next(errorHandler(404,'you can delete only your own listing'));
+  }
+  try {
+    console.log('try block');
+    await Listing.findByIdAndDelete(req.params.id);
+    res.status(200).json('List has been deleted');  
+  } catch (err) {
+    next(err);
+  };
+
+};
