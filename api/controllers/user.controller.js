@@ -1,6 +1,6 @@
 import { errorHandler } from "../utils/error.js";
-import bcryptjs  from 'bcryptjs';
-import User from '../models/user.model.js';
+import bcryptjs from "bcryptjs";
+import User from "../models/user.model.js";
 import Listing from "../models/listing.model.js";
 export const test = (req, res) => {
   res.json({
@@ -9,10 +9,10 @@ export const test = (req, res) => {
 };
 
 export const updateUser = async (req, res, next) => {
-  console.log(req.params.id==req.user.id);
-  console.log("data from update req.body",req.body);
+  console.log(req.params.id == req.user.id);
+  console.log("data from update req.body", req.body);
   if (req.user.id !== req.params.id)
-     return next(errorHandler(401, 'You can only update your own account!'));
+    return next(errorHandler(401, "You can only update your own account!"));
   try {
     if (req.body.password) {
       req.body.password = bcryptjs.hashSync(req.body.password, 10);
@@ -39,31 +39,42 @@ export const updateUser = async (req, res, next) => {
   }
 };
 
-export const deleteUser = async (req, res,next) => {
-  if (req.user.id !== req.params.id) 
-    return next(errorHandler(401, 'you can delete only your account'));
+export const deleteUser = async (req, res, next) => {
+  if (req.user.id !== req.params.id)
+    return next(errorHandler(401, "you can delete only your account"));
 
+  try {
+    await User.findByIdAndDelete(req.user.id);
+    res.clearCookie("access_token");
+    res.status(200).json("message: user deleted successfully");
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const getUserListings = async (req, res, next) => {
+  if (req.user.id === req.params.id) {
+    const listing = await Listing.find({ userRef: req.params.id });
+    res.status(200).json(listing);
     try {
-      await User.findByIdAndDelete(req.user.id);
-      res.clearCookie('access_token');
-      res.status(200).json('message: user deleted successfully');
     } catch (error) {
       next(error);
     }
+  } else {
+    return next(errorHandler(401, "You can only view your own listings"));
   }
-
-  export const getUserListings = async (req, res, next) => {
-
-    if (req.user.id === req.params.id)
-    {
-      const listing = await Listing.find({userRef: req.params.id});
-      res.status(200).json(listing);
-      try {
-      } catch (error) {
-        next(error);
-      }
-    }else{
-      return next(errorHandler(401,'You can only view your own listings'));
-    }
+};
+export const getUser = async (req, res, next) => {
+  try {
+    
+    const user = await User.findById(req.params.id);
+  
+    if (!user) return next(errorHandler(404, 'User not found!'));
+  
+    const { password: pass, ...rest } = user._doc;
+  
+    res.status(200).json(rest);
+  } catch (error) {
+    next(error);
   }
-
+};
