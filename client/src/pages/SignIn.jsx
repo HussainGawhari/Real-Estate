@@ -55,6 +55,7 @@ export default function SignIn() {
           className=" p-3 border rounded-lg mt-3"
           id="email"
           placeholder="Email"
+          required
           onChange={handleChange}
         />
         <input
@@ -62,6 +63,7 @@ export default function SignIn() {
           className=" p-3 border rounded-lg"
           id="password"
           placeholder="Password"
+          required  
           onChange={handleChange}
         />
         <button

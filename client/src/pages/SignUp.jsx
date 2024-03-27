@@ -1,23 +1,15 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useForm } from 'react-hook-form';
 import OAuth from "../components/OAuth";
+import { Link, useNavigate } from "react-router-dom";
 
-export default function SignUp() {
-  const [formData, setFormData] = useState({});
-  const [error, setError] = useState(null);
+function SignUpForm() {
+
+  const { register, handleSubmit, formState: { errors } } = useForm();
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.id]: e.target.value,
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const onSubmit = async (formData) => {
     try {
       setLoading(true);
       const res = await fetch("/api/auth/signup", {
@@ -29,60 +21,71 @@ export default function SignUp() {
       });
       const data = await res.json();
       console.log(data);
+      console.log(formData);
+
       if (data.success === false) {
         setLoading(false);
-        setError(data.message);
         return;
       }
       setLoading(false);
-      setError(null);
       navigate("/sign-in");
     } catch (e) {
       setLoading(false);
-      setError(error.message);
+      
     }
   };
 
-
   return (
-    <div className=" p-3 max-w-lg mx-auto gap-3">
-      <h1 className=" text-3xl text-center font-semibold">Sign up</h1>
-      <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+    <div className="p-3 max-w-lg mx-auto gap-3">
+      <h1 className="text-3xl text-center font-semibold">Sign up</h1>
+      <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col gap-3">
         <input
           type="text"
-          className=" p-3 border rounded-lg mt-3"
+          className="p-3 border rounded-lg mt-3"
           id="username"
           placeholder="Username"
-          onChange={handleChange}
+          name="username"
+          {...register('username', { required: true })}
         />
+        {errors.username && <p className="text-red-500 mt-5">User name is required.</p>}
+
         <input
           type="text"
-          className=" p-3 border rounded-lg"
+          className="p-3 border rounded-lg"
           id="email"
           placeholder="Email"
-          onChange={handleChange}
+          name="email"
+          {...register('email', { required: 'Email is required', pattern: { value: /\S+@\S+\.\S+/, message: 'Invalid email address' } })}
         />
+        {errors.email && <p className="text-red-500 mt-5">Enter a valid email.</p>}
+
         <input
-          type="text"
-          className=" p-3 border rounded-lg"
+          type="password"
+          className="p-3 border rounded-lg"
           id="password"
           placeholder="Password"
-          onChange={handleChange}
+          name="password"
+          {...register('password', { required: 'Password is required', minLength: { value: 6, message: 'Password must be at least 6 characters' } })}
         />
+        {errors.password && <p className="text-red-500 mt-5">Enter a valid password.</p>}
+
         <button
-        disabled = {loading}
-        className="bg-slate-700 text-white rounded-lg uppercase p-3 hover:opacity-95 disabled:opacity-80"
-        > {loading ? "Loading..." : "Sign up"}
+          disabled={loading}
+          className="bg-slate-700 text-white rounded-lg uppercase p-3 hover:opacity-95 disabled:opacity-80"
+        >
+          {loading ? 'Loading...' : 'Sign up'}
         </button>
         <OAuth />
       </form>
-      <div className="flex  gap-2">
+      <div className="flex gap-2">
         <p>Have an account?</p>
         <Link to="/sign-in">
           <span className="text-blue-700">Sign in</span>
         </Link>
-        {error && <p className='text-red-500 mt-5'>{error}</p>}
+        {/* {error && <p className="text-red-500 mt-5">{error}</p>} */}
       </div>
     </div>
   );
 }
+
+export default SignUpForm;
