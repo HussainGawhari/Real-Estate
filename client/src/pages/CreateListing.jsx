@@ -8,7 +8,7 @@ import {
   ref,
   uploadBytesResumable,
 } from "firebase/storage";
-import { get } from "mongoose";
+
 
 export default function CreateListing() {
   const { currentUser } = useSelector((state) => state.user);
